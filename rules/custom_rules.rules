@@ -1,0 +1,31 @@
+# rules/custom_rules.rules
+
+# SQL Injection Detection (Enhanced)
+alert tcp any any -> any 80 (msg:"Enhanced SQL Injection Detection"; 
+    content:"' OR 1=1 --"; 
+    nocase; 
+    pcre:"/(\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION)\b.{0,20}\b(FROM|WHERE|VALUES)\b)/i"; 
+    threshold: type limit, track by_src, count 5, seconds 60;
+    sid:1000001; 
+    rev:2;
+)
+
+# XSS Detection (Enhanced)
+alert tcp any any -> any 80 (msg:"Enhanced XSS Attack Detection"; 
+    content:"<script"; 
+    nocase; 
+    pcre:"/(<script[\s\S]*?>[\s\S]*?<\/script>|javascript:|onerror=|alert\()/i"; 
+    threshold: type limit, track by_src, count 3, seconds 30;
+    sid:1000002; 
+    rev:2;
+)
+
+# Command Injection Detection (Enhanced)
+alert tcp any any -> any 80 (msg:"Enhanced Command Injection Detection"; 
+    content:"; ls"; 
+    nocase; 
+    pcre:"/(\b(;|\||&&)\s*[a-zA-Z0-9_\-\.]+)/i"; 
+    threshold: type limit, track by_src, count 2, seconds 60;
+    sid:1000003; 
+    rev:2;
+)

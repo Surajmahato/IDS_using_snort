@@ -1,0 +1,38 @@
+# SQL Injection Detection (Optimized)
+alert tcp any any -> any 80 (msg:"Optimized SQL Injection Detection"; 
+    content:"|27 4F 52|";  # Hex representation of "' OR"
+    nocase; 
+    pcre:"/(\b(OR|AND)\b.{0,20}\b(1=1|TRUE)\b)/i"; 
+    threshold: type limit, track by_src, count 5, seconds 60;
+    sid:1000005; 
+    rev:1;
+)
+
+# Cross-Site Scripting (XSS) Detection (Optimized)
+alert tcp any any -> any 80 (msg:"Optimized XSS Attack Detection"; 
+    content:"<script"; 
+    nocase; 
+    pcre:"/(<script[\s\S]*?>[\s\S]*?<\/script>|javascript:|onerror=|alert\()/i"; 
+    threshold: type limit, track by_src, count 3, seconds 30;
+    sid:1000006; 
+    rev:1;
+)
+
+# Command Injection Detection (Optimized)
+alert tcp any any -> any 80 (msg:"Optimized Command Injection Detection"; 
+    content:"|3B 6C 73|";  # Hex representation of "; ls"
+    nocase; 
+    pcre:"/(\b(;|\||&&)\s*[a-zA-Z0-9_\-\.]+)/i"; 
+    threshold: type limit, track by_src, count 2, seconds 60;
+    sid:1000007; 
+    rev:1;
+)
+
+# Advanced Payload Inspection (Optimized)
+alert tcp any any -> any any (msg:"Optimized Suspicious Payload Pattern"; 
+    content:!"HTTP/1.1 200 OK"; 
+    content:!"Content-Type: text/html"; 
+    threshold: type limit, track by_src, count 10, seconds 60; 
+    sid:1000008; 
+    rev:1;
+)
