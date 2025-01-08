@@ -1,31 +1,17 @@
-# rules/custom_rules.rules
+# SQL Injection Detection
+(?i)(\bOR\b\s*1=1|UNION\s+SELECT|SELECT\s+\*\s+FROM|DROP\s+TABLE|INSERT\s+INTO|DELETE\s+FROM|--|\/*.*?\*\/|\bAND\b\s*1=1)
+(?i)(\'\s*OR\s*\'1\'=\'1|\'\s*AND\s*\'1\'=\'1|\'\s*OR\s*\'a\'=\'a|%27%20OR%201=1|%27%20AND%201=1)
+(?i)(\'\s*UNION\s+SELECT\s+NULL|\'\s*OR\s+EXISTS|LOAD_FILE\s*\(|INFORMATION_SCHEMA|CONCAT\(|SLEEP\(\))
 
-# SQL Injection Detection (Enhanced)
-alert tcp any any -> any 80 (msg:"Enhanced SQL Injection Detection"; 
-    content:"' OR 1=1 --"; 
-    nocase; 
-    pcre:"/(\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION)\b.{0,20}\b(FROM|WHERE|VALUES)\b)/i"; 
-    threshold: type limit, track by_src, count 5, seconds 60;
-    sid:1000001; 
-    rev:2;
-)
 
-# XSS Detection (Enhanced)
-alert tcp any any -> any 80 (msg:"Enhanced XSS Attack Detection"; 
-    content:"<script"; 
-    nocase; 
-    pcre:"/(<script[\s\S]*?>[\s\S]*?<\/script>|javascript:|onerror=|alert\()/i"; 
-    threshold: type limit, track by_src, count 3, seconds 30;
-    sid:1000002; 
-    rev:2;
-)
+# XSS Detection
+(?i)(<script.*?>.*?</script>|javascript:|on\w+\s*=|<img\s+.*?onerror\s*=|<svg\s+.*?onload=|eval\(.*?\)|document\.write)
+(?i)(<iframe\s+.*?src=|&#x3C;script&#x3E;|&#x3C;img.*?onerror&#x3D;|%3Cscript%3E.*?%3C%2Fscript%3E|alert\(|window\.location)
+(?i)(<div\s+onmouseover=|<body\s+onload=|setTimeout\(.*?alert\)|String\.fromCharCode\(\))
 
-# Command Injection Detection (Enhanced)
-alert tcp any any -> any 80 (msg:"Enhanced Command Injection Detection"; 
-    content:"; ls"; 
-    nocase; 
-    pcre:"/(\b(;|\||&&)\s*[a-zA-Z0-9_\-\.]+)/i"; 
-    threshold: type limit, track by_src, count 2, seconds 60;
-    sid:1000003; 
-    rev:2;
-)
+
+# Command Injection Detection
+(?i)(;|&&|\|\||/bin/(sh|bash)|cat\s+/etc/passwd|curl|wget|nc\s+-e|>\s*/tmp/|>\s*/dev/null|`.*?`|\$\(.*?\)|${IFS})
+(?i)(/dev/tcp/|/dev/udp/|echo\s+\$.*|chmod\s+\d{3}|ls\s+-la|sudo\s+.*?python|python\s+-c|bash\s+-i)
+(?i)(;.*?(sleep|ping\s+-c|timeout)|%3B.*?ls|%26%26.*?cat\s+/etc/passwd)
+

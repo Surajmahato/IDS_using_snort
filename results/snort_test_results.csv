@@ -1,0 +1,3 @@
+Ruleset,Detected Attacks,False Positives,Accuracy (%)
+Custom Rules,278,55,70.0
+Optimized Rules,157,7,62.8
